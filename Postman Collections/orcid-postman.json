@@ -1,0 +1,307 @@
+{
+  "info": {
+    "_postman_id": "b345a8e6-e765-45c3-8e86-87f18eac5a47",
+    "name": "ORCID",
+    "description": "ORCID offers two APIs. The Member API which allows writing and reading limited access information and is available to organizations who are members of ORCID, and the Public API which allows reading public access information and is available for anyone to use. Both APIs use the same workflow for requesting access and making calls.\r\n\r\n# Environments\r\n\r\nIn addition to the production environment at https://orcid.org, ORCID offers a developers sandbox at https://sandbox.orcid.org/ for testing, you do not need to be an ORCID member to test on the Member API on the sandbox.\r\n\r\n[More information about the ORCID APIs](https://github.com/ORCID/ORCID-Source/tree/master/orcid-api-web)\r\n\r\n# Getting Credentials\r\nTo access the API you will use a client ID and secret issued by ORCID.\r\n\r\n**Member Credentials**\r\n\r\n[Request credentials](https://orcid.org/content/register-client-application) to request a client for the production or sandbox environment.\r\n\r\n**Public Credentials**\r\n\r\n[Developer Tools](https://sandbox.orcid.org/developer-tools) on your ORCID record can be used to register Public Credentials.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authorization request",
+      "_postman_id": "0f497856-ae2e-4080-9046-049a45a92c01",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://sandbox.orcid.org/oauth/authorize?client_id={{APP-XXXXXXXXXXXXXXXXX}}&response_type=code&scope=/authenticate&redirect_uri=https://developers.google.com/oauthplayground\n",
+          "protocol": "https",
+          "host": [
+            "sandbox",
+            "orcid",
+            "org"
+          ],
+          "path": [
+            "oauth",
+            "authorize"
+          ],
+          "query": [
+            {
+              "key": "client_id",
+              "value": "{{APP-XXXXXXXXXXXXXXXXX}}"
+            },
+            {
+              "key": "response_type",
+              "value": "code"
+            },
+            {
+              "key": "scope",
+              "value": "/authenticate"
+            },
+            {
+              "key": "redirect_uri",
+              "value": "https://developers.google.com/oauthplayground\n"
+            }
+          ]
+        },
+        "description": "**1. Create an Authorization URL to request access**\n\n| Parameter             |Contents               |\n|--------------------|--------------------------|\n| host \t\t\t\t| https://sandbox.orcid.org/oauth/authorize|\n| client\\_id \t\t| *Your client ID*|\n| response\\_type\t| code|\n| scope\t\t\t\t| [*Your selected scopes*](https://github.com/ORCID/orcid-model/blob/master/src/main/resources/record_2.1#scopes)|\n| redirect\\_uri\t\t| *Your landing page*|\n\nFor more information on customizing sign in screen go to [Customizing the Oauth Sign-in screen ](http://members.orcid.org/api/resources/customize)\n\n**2. Visit the URL and grant access**\n\nYou will need to log into your ORCID record using the Registry Interface. After granting access you will be taken to the redirect URI with a six-digit authorization code appended to the URL.\n\n> The URL must be open in a browser"
+      },
+      "response": []
+    },
+    {
+      "name": "Token exchange",
+      "_postman_id": "c75ce12f-d90a-4718-ba10-708ecd911e0c",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "code",
+              "value": "{{CODE}}",
+              "type": "text"
+            },
+            {
+              "key": "client_id",
+              "value": "{{CLIENT_ID}}",
+              "type": "text"
+            },
+            {
+              "key": "client_secret",
+              "value": "{{CLIENT_SECRET}}",
+              "type": "text"
+            },
+            {
+              "key": "grant_type",
+              "value": "authorization_code",
+              "type": "text"
+            },
+            {
+              "key": "redirect_uri",
+              "value": "https://developers.google.com/oauthplayground",
+              "type": "text"
+            }
+          ],
+          "options": {
+            "urlencoded": {}
+          }
+        },
+        "url": "https://sandbox.orcid.org/oauth/token",
+        "description": "**3. Exchange the authorization code for an access token**\r\n\r\n| Item               |Parameter               |\r\n|--------------------|--------------------------|\r\n| URL \t\t\t\t| https://sandbox.orcid.org/oauth/token|\r\n| client\\_id \t\t| *Your client ID*|\r\n| client\\_secret\t| *Your client secret*|\r\n| grant\\_type\t\t| authorization\\_code|\r\n| code\t\t\t\t| *The authorization code*|"
+      },
+      "response": []
+    },
+    {
+      "name": "Display ORCID record Pub API",
+      "_postman_id": "9fc562c8-4d56-4341-bee6-fc782ab31ec3",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-type",
+            "value": "application/vnd.orcid+xml"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TOKEN}}"
+          }
+        ],
+        "url": "https://pub.sandbox.orcid.org/v3.0/{{ORCID}}",
+        "description": "**5. Use the access token and ORCID iD to read or update the record.**\r\n\r\nSee the current [XSD documentation](https://github.com/ORCID/orcid-model/blob/master/src/main/resources/record_2.1/README.md#calls) for possible calls.\r\n\r\n| Item          |Parameter            |\r\n|---------------|---------------------|\r\n| orcid \t\t| *The ORCID ID*      |\r\n| token\t\t\t|*The generated token*|"
+      },
+      "response": []
+    },
+    {
+      "name": "Search in the public API",
+      "_postman_id": "13187a9a-ffba-4efc-bbde-aea17187d261",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-type",
+            "value": "application/vnd.orcid+xml"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TOKEN}}"
+          }
+        ],
+        "url": {
+          "raw": "https://pub.sandbox.orcid.org/v3.0/search/?q={{biography:MyBiography}}&rows=5",
+          "protocol": "https",
+          "host": [
+            "pub",
+            "sandbox",
+            "orcid",
+            "org"
+          ],
+          "path": [
+            "v3.0",
+            "search",
+            ""
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "{{biography:MyBiography}}"
+            },
+            {
+              "key": "rows",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add employment",
+      "_postman_id": "ee229940-0e36-45da-97f4-ddcd07b74ac7",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-type",
+            "value": "application/vnd.orcid+xml"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TOKEN}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<employment:employment \r\n\txmlns:employment=\"http://www.orcid.org/ns/employment\" xmlns:common=\"http://www.orcid.org/ns/common\"\r\n\txmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n\txsi:schemaLocation=\"http://www.orcid.org/ns/employment ../employment-3.0.xsd \">\r\n    <common:department-name>Development</common:department-name>\r\n    <common:role-title>Full stack developer, registry</common:role-title>\r\n    <common:start-date>\r\n        <common:year>2013</common:year>\r\n        <common:month>03</common:month>\r\n        <common:day>04</common:day>\r\n    </common:start-date>\r\n    <common:organization>\r\n        <common:name>ORCID Inc</common:name>\r\n        <common:address>\r\n            <common:city>Bethesda</common:city>\r\n            <common:region>MD</common:region>\r\n            <common:country>US</common:country>\r\n        </common:address>\r\n        <common:disambiguated-organization>\r\n            <common:disambiguated-organization-identifier>385488</common:disambiguated-organization-identifier>\r\n            <common:disambiguation-source>RINGGOLD</common:disambiguation-source>\r\n        </common:disambiguated-organization>\r\n    </common:organization>\r\n    <common:external-ids>\r\n        <common:external-id>\r\n            <common:external-id-type>url</common:external-id-type>\r\n            <common:external-id-value>https://orcid.org/0000-0002-7869-831X</common:external-id-value>\r\n            <common:external-id-url>https://orcid.org/0000-0002-7869-831X</common:external-id-url>\r\n            <common:external-id-relationship>self</common:external-id-relationship>\r\n        </common:external-id>\r\n    </common:external-ids>\r\n</employment:employment>",
+          "options": {
+            "raw": {}
+          }
+        },
+        "url": "https://api.sandbox.orcid.org/v3.0/{{ORCID}}/employment",
+        "description": "| Item          |Parameter            |\r\n|---------------|---------------------|\r\n| orcid \t\t| *The ORCID ID*      |\r\n| token\t\t\t|*The generated token*|"
+      },
+      "response": []
+    },
+    {
+      "name": "Add work",
+      "_postman_id": "fc828cf5-0ecb-4aa9-9a7f-aa7af120e20a",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-type",
+            "value": "application/vnd.orcid+xml"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TOKEN}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<work:work\r\n\txmlns:common=\"http://www.orcid.org/ns/common\" xmlns:work=\"http://www.orcid.org/ns/work\"\r\n\txmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n\txsi:schemaLocation=\"http://www.orcid.org/ns/work /work-3.0.xsd \">\t\r\n\t<work:title>\r\n\t\t<common:title>ORCID Public Data File 2020</common:title>\r\n\t</work:title>\r\n\t<work:type>data-set</work:type>\r\n\t<common:external-ids>\r\n\t\t<common:external-id>\r\n\t\t\t<common:external-id-type>doi</common:external-id-type>\r\n\t\t\t<common:external-id-value>10.6084/m9.figshare.4134027.v1</common:external-id-value>\t\t\t\r\n\t\t\t<common:external-id-url>https://doi.org/10.6084/m9.figshare.4134027.v1</common:external-id-url>\r\n\t\t\t<common:external-id-relationship>self</common:external-id-relationship>\r\n\t\t</common:external-id>\r\n\t</common:external-ids>\r\n</work:work>",
+          "options": {
+            "raw": {}
+          }
+        },
+        "url": "https://api.sandbox.orcid.org/v3.0/{{ORCID}}/work",
+        "description": "| Item          |Parameter            |\r\n|---------------|---------------------|\r\n| orcid \t\t| *The ORCID ID*      |\r\n| token\t\t\t|*The generated token*|"
+      },
+      "response": []
+    },
+    {
+      "name": "Display ORCID record",
+      "_postman_id": "c8c1fcc2-9014-4fe1-a4d7-3c61a8e90bf5",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-type",
+            "value": "application/vnd.orcid+xml"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TOKEN}}"
+          }
+        ],
+        "url": "https://api.sandbox.orcid.org/v3.0/{{ORCID}}",
+        "description": "\r\n| Item          |Parameter            |\r\n|---------------|---------------------|\r\n| orcid \t\t| *The ORCID ID*      |\r\n| token\t\t\t|*The generated token*|"
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "oauth2",
+    "oauth2": {
+      "clientSecret": "{{client_secret}}",
+      "clientId": "{{client_id}}",
+      "authUrl": "https://sandbox.orcid.org/oauth/authorize",
+      "client_authentication": "header",
+      "scope": "/read-public",
+      "accessTokenUrl": "https://sandbox.orcid.org/oauth/token",
+      "tokenName": "Read public",
+      "addTokenTo": "header"
+    }
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "id": "058a6e26-003b-482e-abe7-360db02b2c39",
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "id": "6b97db71-eaab-4878-88f8-8748d2340ba2",
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "id": "58be2cc2-34e5-4530-94b7-d01ec7048d0b",
+      "key": "client_id",
+      "value": "client_id",
+      "type": "string"
+    },
+    {
+      "id": "ed7cb85d-ab75-48e3-a289-95dee98e11ed",
+      "key": "client_secret",
+      "value": "client_secret",
+      "type": "string"
+    }
+  ]
+}
